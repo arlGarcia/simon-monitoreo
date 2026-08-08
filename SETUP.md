@@ -1,4 +1,4 @@
-# SETUP.md — Guía de Despliegue Completo
+# SETUP.md - Guía de Despliegue y Pruebas
 
 ## Prerrequisitos Globales
 | Entorno | Requerimiento |
@@ -32,14 +32,14 @@ El frontend contiene un dashboard predictivo con soporte offline incorporado usa
 cd frontend
 
 # Instalar dependencias
-npm install 
+pnpm install 
 
 # Variables de entorno (Opcional, en caso de cambiar puertos)
 # NEXT_PUBLIC_API_URL=http://localhost:8080
 # NEXT_PUBLIC_WS_URL=ws://localhost:8080
 
 # Iniciar servidor de desarrollo
-npm run dev
+pnpm run dev
 ```
 La interfaz estará disponible en `http://localhost:3000`. 
 Entra con credenciales `admin` / `admin123` para ver alertas predictivas.
@@ -50,36 +50,19 @@ Entra con credenciales `admin` / `admin123` para ver alertas predictivas.
 
 La app móvil emula y sincroniza las mismas funcionalidades nativamente, con soporte offline via `AsyncStorage`.
 
-### 3.1. Configuración de Variables de Entorno para Expo Go
-Si deseas probar la app desde un **celular físico** usando la aplicación **Expo Go**, debes configurar tu dirección IP de red local para que el celular pueda comunicarse con el backend en Go de tu computadora:
-
-1. Obtén la IP local de tu PC en la red Wi-Fi:
-   - **Windows**: Ejecuta `ipconfig` en la consola y copia la `Dirección IPv4` (Ejemplo: `192.168.1.7`).
-   - **Mac/Linux**: Ejecuta `ifconfig` o `ip a`.
-2. En la carpeta `mobile`, crea o edita el archivo `.env`:
-   ```env
-   EXPO_PUBLIC_API_URL=http://<TU_IP_LOCAL>:8080
-   EXPO_PUBLIC_WS_URL=ws://<TU_IP_LOCAL>:8080
-   ```
-   *(Ejemplo: `EXPO_PUBLIC_API_URL=http://192.168.1.7:8080`)*
-
-### 3.2. Ejecución de la App Móvil
 ```bash
 cd mobile
 
 # Instalar dependencias
 pnpm install
 
-# Correr la app limpiando caché
-npx expo start -c
+# Correr la app localmente
+pnpm start
 ```
-Se abrirá Expo Metro Bundler y mostrará un código QR en la consola:
-- Asegúrate de que **tu celular y tu computadora estén en la misma red Wi-Fi**.
-- Abre la app **Expo Go** en tu dispositivo Android o la app Cámara en iOS.
-- Escanea el código QR mostrado en la terminal.
-- Inicia sesión con `admin` / `admin123`.
-
-*Nota: También puedes presionar `a` para abrir en emulador de Android Studio o `i` para simulador de iOS.*
+Se abrirá Expo Metro Bundler. Puedes presionar:
+- `a` para abrir en emulador de Android.
+- `i` para abrir en simulador iOS.
+- O escanear el código QR con la app **Expo Go** en un dispositivo físico.
 
 ---
 
@@ -102,5 +85,59 @@ go tool cover -html=coverage.out
 
 ```bash
 cd frontend
-npm run test
+pnpm run test
 ```
+## 6. Pasos para Probar en Postman (Backend, Frontend y Mobile)
+Para agregar manualmente más datos desde Postman, sigue este flujo paso a paso:
+
+### Paso 1: Autenticación (Obtener Token JWT)
+```
+Método: POST
+URL: http://localhost:8080/api/v1/auth/login
+Headers: Content-Type: application/json
+Body (raw / JSON):
+json
+{
+  "username": "admin",
+  "password": "admin123"
+}
+```
+Respuesta: Copia el texto devuelto en la clave "token".
+### Paso 2: Registrar un nuevo vehículo (Backend / Admin)
+```
+Método: POST
+URL: http://localhost:8080/api/v1/vehicles
+Headers:
+Content-Type: application/json
+Authorization: Bearer TU_TOKEN_AQUÍ
+Body (raw / JSON):
+json
+{
+  "name": "Camión de Carga 05",
+  "license_plate": "MNO-999",
+  "owner_id": "flota-norte"
+}
+```
+Respuesta: Recibirás un objeto JSON con el id generado para el vehículo (ej: 8a7b9c1d-...). Copia ese id.
+### Paso 3: Ingerir datos de Telemetría/Sensores (Visualización en tiempo real)
+```
+Método: POST
+URL: http://localhost:8080/api/v1/vehicles/ID_DEL_VEHICULO/sensor (Reemplaza ID_DEL_VEHICULO por el ID obtenido en el paso 2)
+Headers:
+Content-Type: application/json
+Authorization: Bearer TU_TOKEN_AQUÍ
+Body (raw / JSON):
+json
+{
+  "latitude": 4.6097,
+  "longitude": -74.0817,
+  "speed": 115.0,
+  "fuel_level": 12.0,
+  "temperature": 94.0
+}
+```
+
+### Nota sobre el comportamiento en Web y Mobile:
+
+* Al enviar la petición en Postman, el Backend procesará el dato y lo enviará vía WebSocket a los clientes conectados.
+* Tanto en la Web (Next.js) como en la App Mobile (Expo), verás actualizarse la posición en el mapa, los gráficos y, al haber superado los 100 km/h o tener <15% de combustible, saltará una alerta predictiva en vivo.
