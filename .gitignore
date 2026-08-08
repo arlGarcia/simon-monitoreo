@@ -1,0 +1,50 @@
+# ==========================================
+# FRONTEND (Next.js + PNPM + Jest)
+# ==========================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/coverage/
+frontend/.pnpm-debug.log*
+
+# ==========================================
+# MOBILE (React Native / Expo)
+# ==========================================
+mobile/node_modules/
+mobile/.expo/
+mobile/dist/
+mobile/build/
+mobile/.pnpm-debug.log*
+
+# ==========================================
+# BACKEND (Go)
+# ==========================================
+# Binarios compilados de Go
+backend/cmd/api/api
+backend/cmd/api/api.exe
+backend/bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# ==========================================
+# ARCHIVOS GENERALES Y SECRETOS
+# ==========================================
+# Variables de entorno y secretos (¡Nunca subir claves!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Archivos de sistema operativo y editores/IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

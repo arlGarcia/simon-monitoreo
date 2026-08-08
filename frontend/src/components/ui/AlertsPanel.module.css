@@ -1,0 +1,83 @@
+.panel {
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fca5a5;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge {
+  background: #ef4444;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  margin-left: auto;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.alertItem {
+  display: flex;
+  gap: 10px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.alertIcon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.alertBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.alertMessage {
+  font-size: 0.78rem;
+  color: #fca5a5;
+  margin: 0 0 3px;
+}
+
+.alertMeta {
+  font-size: 0.68rem;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.empty {
+  color: #4b5563;
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 24px 0;
+}
