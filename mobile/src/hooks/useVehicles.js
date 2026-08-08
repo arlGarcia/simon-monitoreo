@@ -16,6 +16,19 @@ export function useVehicles() {
       setVehicles(list);
       setOffline(false);
       await cacheVehicles(list);
+
+      const readingsMap = {};
+      await Promise.all(
+        list.map(async (v) => {
+          const vId = v.id || v.ID;
+          if (!vId) return;
+          try {
+            const reading = await api.getLatestReading(vId);
+            if (reading) readingsMap[vId] = reading;
+          } catch {}
+        })
+      );
+      setLatestReadings((prev) => ({ ...prev, ...readingsMap }));
     } catch {
       setOffline(true);
       const cached = await getCachedVehicles();

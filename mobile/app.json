@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "FleetPulse",
-    "slug": "fleetpulse",
+    "name": "SimonGO",
+    "slug": "SimonGO",
     "version": "1.0.0",
-    "scheme": "fleetpulse",
+    "scheme": "SimonGO",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -17,19 +17,17 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#070d1a"
       },
-      "package": "com.fleetpulse.monitor",
-      "googleServicesFile": "./google-services.json"
+      "package": "com.SimonGO.monitor"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.fleetpulse.monitor"
+      "bundleIdentifier": "com.SimonGO.monitor"
     },
     "plugins": [
       "expo-router",
       [
         "expo-notifications",
         {
-          "icon": "./assets/notification-icon.png",
           "color": "#22d3ee"
         }
       ]

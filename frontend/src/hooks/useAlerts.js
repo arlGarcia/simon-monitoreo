@@ -22,7 +22,14 @@ export function useAlerts(vehicleId) {
   }, [vehicleId]);
 
   const addAlert = useCallback((alert) => {
-    setAlerts((prev) => [alert, ...prev]);
+    if (!alert) return;
+    setAlerts((prev) => {
+      const alertId = alert.id || alert.ID;
+      if (alertId && prev.some((a) => (a.id || a.ID) === alertId)) {
+        return prev;
+      }
+      return [alert, ...prev];
+    });
     cacheAlert(alert);
   }, []);
 

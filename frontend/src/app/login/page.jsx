@@ -33,7 +33,7 @@ export default function LoginPage() {
         <div className={styles.logoRow}>
           <span className={styles.logoIcon}>🛰️</span>
           <div>
-            <h1 className={styles.logoTitle}>FleetPulse</h1>
+            <h1 className={styles.logoTitle}>SimonGO</h1>
             <p className={styles.logoSub}>IoT Fleet Monitoring</p>
           </div>
         </div>

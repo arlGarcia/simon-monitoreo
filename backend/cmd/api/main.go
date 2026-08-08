@@ -41,10 +41,10 @@ func main() {
 	sensorService := application.NewSensorService(sensorRepo, alertRepo, wsHub)
 	vehicleService := application.NewVehicleService(vehicleRepo, alertRepo)
 
-	seedAdminUser(context.Background(), userRepo)
+	seedAdminUser(context.Background(), userRepo, vehicleRepo, sensorService)
 
 	authHandler := web.NewAuthHandler(authService)
-	vehicleHandler := web.NewVehicleHandler(vehicleService)
+	vehicleHandler := web.NewVehicleHandler(vehicleService, sensorService)
 	sensorHandler := web.NewSensorHandler(sensorService)
 
 	authMiddleware := web.AuthMiddleware(authService)
@@ -97,7 +97,7 @@ func envOrDefault(key, defaultValue string) string {
 	return defaultValue
 }
 
-func seedAdminUser(ctx context.Context, userRepo *postgres.UserPostgresRepository) {
+func seedAdminUser(ctx context.Context, userRepo *postgres.UserPostgresRepository, vehicleRepo *postgres.VehiclePostgresRepository, sensorService *application.SensorService) {
 	_, err := userRepo.FindByUsername(ctx, "admin")
 	if err == domain.ErrUserNotFound {
 		admin := domain.User{
@@ -112,5 +112,104 @@ func seedAdminUser(ctx context.Context, userRepo *postgres.UserPostgresRepositor
 		} else {
 			log.Println("admin user seeded (username: admin, password: admin123)")
 		}
+	}
+
+	vehicles, err := vehicleRepo.FindAll(ctx)
+	if err == nil && len(vehicles) == 0 {
+		initialVehicles := []struct {
+			name  string
+			plate string
+			lat   float64
+			lng   float64
+			points []struct {
+				speed float64
+				fuel  float64
+				temp  float64
+			}
+		}{
+			{
+				name:  "Camión de Carga 01",
+				plate: "ABC-123",
+				lat:   4.6097,
+				lng:   -74.0817,
+				points: []struct {
+					speed float64
+					fuel  float64
+					temp  float64
+				}{
+					{40.0, 95.0, 80.0},
+					{55.0, 90.0, 83.0},
+					{70.0, 85.0, 85.0},
+					{85.0, 78.5, 88.0},
+				},
+			},
+			{
+				name:  "Furgón Reparto 02",
+				plate: "XYZ-789",
+				lat:   4.6500,
+				lng:   -74.0500,
+				points: []struct {
+					speed float64
+					fuel  float64
+					temp  float64
+				}{
+					{60.0, 45.0, 85.0},
+					{80.0, 30.0, 89.0},
+					{95.0, 20.0, 92.0},
+					{105.0, 14.0, 95.0},
+				},
+			},
+			{
+				name:  "Camioneta Logística 03",
+				plate: "KLO-456",
+				lat:   4.7110,
+				lng:   -74.0720,
+				points: []struct {
+					speed float64
+					fuel  float64
+					temp  float64
+				}{
+					{30.0, 70.0, 78.0},
+					{45.0, 62.0, 80.0},
+					{50.0, 55.0, 81.0},
+					{60.0, 50.0, 82.0},
+				},
+			},
+		}
+
+		for _, item := range initialVehicles {
+			v := domain.Vehicle{
+				ID:           uuid.NewString(),
+				DisplayID:    "VEH-" + item.plate,
+				Name:         item.name,
+				LicensePlate: item.plate,
+				OwnerID:      "flota-principal",
+				CreatedAt:    time.Now(),
+			}
+			if err := vehicleRepo.Save(ctx, v); err == nil {
+				for i, pt := range item.points {
+					// Distribuir el tiempo simulado en intervalos pasados
+					reading := domain.SensorReading{
+						ID:          uuid.NewString(),
+						VehicleID:   v.ID,
+						Latitude:    item.lat + (float64(i) * 0.001),
+						Longitude:   item.lng + (float64(i) * 0.001),
+						Speed:       pt.speed,
+						FuelLevel:   pt.fuel,
+						Temperature: pt.temp,
+						RecordedAt:  time.Now().Add(-time.Duration(len(item.points)-i) * 5 * time.Minute),
+					}
+					_ = sensorService.IngestReading(ctx, application.IngestSensorDataRequest{
+						VehicleID:   reading.VehicleID,
+						Latitude:    reading.Latitude,
+						Longitude:   reading.Longitude,
+						Speed:       reading.Speed,
+						FuelLevel:   reading.FuelLevel,
+						Temperature: reading.Temperature,
+					})
+				}
+			}
+		}
+		log.Println("initial vehicles and rich historical telemetry data seeded automatically")
 	}
 }

@@ -31,9 +31,10 @@ export function AlertsPanel({ alerts }) {
         {alerts.length === 0 && (
           <p className={styles.empty}>No active alerts</p>
         )}
-        {alerts.map((a) => (
-          <AlertItem key={a.id} alert={a} />
-        ))}
+        {alerts.map((a, idx) => {
+          const key = a.id || a.ID ? `${a.id || a.ID}-${idx}` : `alert-${idx}`;
+          return <AlertItem key={key} alert={a} />;
+        })}
       </div>
     </section>
   );

@@ -36,7 +36,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>FleetPulse</Text>
+      <Text style={styles.title}>SimonGO</Text>
       <Text style={styles.subtitle}>Mobile Monitor</Text>
 
       <View style={styles.form}>
@@ -59,8 +59,8 @@ export default function LoginScreen() {
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <TouchableOpacity 
-          style={styles.button} 
+        <TouchableOpacity
+          style={styles.button}
           onPress={handleLogin}
           disabled={loading}
         >

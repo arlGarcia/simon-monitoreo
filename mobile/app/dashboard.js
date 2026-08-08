@@ -29,8 +29,12 @@ export default function DashboardScreen() {
   useWebSocket({ onSensorReading: handleSensorReading, onAlert: handleAlert });
 
   const renderMap = () => {
-    const reading = selectedVehicle ? latestReadings[selectedVehicle.id] : null;
+    const vId = selectedVehicle ? (selectedVehicle.id || selectedVehicle.ID) : null;
+    const reading = vId ? latestReadings[vId] : null;
     
+    const lat = reading?.latitude ?? reading?.Latitude;
+    const lng = reading?.longitude ?? reading?.Longitude;
+
     // Default center (Bogota)
     const initialRegion = {
       latitude: 4.7109,
@@ -39,9 +43,9 @@ export default function DashboardScreen() {
       longitudeDelta: 0.1,
     };
 
-    const region = reading ? {
-      latitude: reading.latitude,
-      longitude: reading.longitude,
+    const region = (lat && lng && !isNaN(lat) && !isNaN(lng)) ? {
+      latitude: lat,
+      longitude: lng,
       latitudeDelta: 0.05,
       longitudeDelta: 0.05,
     } : initialRegion;
@@ -54,15 +58,23 @@ export default function DashboardScreen() {
           userInterfaceStyle="dark"
         >
           {vehicles.map(v => {
-            const r = latestReadings[v.id];
+            const vId = v.id || v.ID;
+            const r = latestReadings[vId];
             if (!r) return null;
+
+            const lat = r.latitude ?? r.Latitude;
+            const lng = r.longitude ?? r.Longitude;
+            const fuel = r.fuel_level ?? r.FuelLevel ?? 0;
+
+            if (!lat || !lng || isNaN(lat) || isNaN(lng)) return null;
+
             return (
               <Marker
-                key={v.id}
-                coordinate={{ latitude: r.latitude, longitude: r.longitude }}
+                key={vId}
+                coordinate={{ latitude: lat, longitude: lng }}
                 title={v.name}
-                description={`Fuel: ${r.fuel_level?.toFixed(1)}%`}
-                pinColor={r.fuel_level < 30 ? 'orange' : 'teal'}
+                description={`Fuel: ${fuel.toFixed(1)}%`}
+                pinColor={fuel < 30 ? 'orange' : 'teal'}
               />
             );
           })}

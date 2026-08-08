@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google';
-import './globals.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import '@/app/globals.css';
 import { AuthProvider } from '@/lib/auth-context';
 
 const inter = Inter({ subsets: ['latin'] });

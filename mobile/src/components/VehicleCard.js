@@ -1,13 +1,19 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 export function VehicleCard({ vehicle, reading, isSelected, onPress }) {
-  const fuelLevel = reading?.fuel_level;
+  const fuelLevel = reading?.fuel_level ?? reading?.FuelLevel;
+  const speed = reading?.speed ?? reading?.Speed;
+  const temp = reading?.temperature ?? reading?.Temperature;
+
   let fgolor = '#a0aec0'; // default muted
-  if (fuelLevel !== undefined) {
+  if (fuelLevel !== undefined && fuelLevel !== null) {
       if (fuelLevel < 20) fgolor = '#fc8181';
       else if (fuelLevel < 40) fgolor = '#f6e05e';
       else fgolor = '#68d391';
   }
+
+  const dispId = vehicle?.display_id || vehicle?.DisplayID;
+  const plate = vehicle?.license_plate || vehicle?.LicensePlate;
 
   return (
     <TouchableOpacity
@@ -17,20 +23,20 @@ export function VehicleCard({ vehicle, reading, isSelected, onPress }) {
     >
       <View style={styles.header}>
         <Text style={styles.title}>{vehicle.name}</Text>
-        {fuelLevel !== undefined && (
+        {fuelLevel !== undefined && fuelLevel !== null && (
           <View style={[styles.badge, { backgroundColor: fgolor + '20' }]}>
             <Text style={[styles.badgeText, { color: fgolor }]}>{Math.round(fuelLevel)}%</Text>
           </View>
         )}
       </View>
       <View style={styles.metaRow}>
-        <Text style={styles.idText}>{vehicle.display_id}</Text>
-        <Text style={styles.plate}>{vehicle.license_plate}</Text>
+        <Text style={styles.idText}>{dispId}</Text>
+        <Text style={styles.plate}>{plate}</Text>
       </View>
       {reading ? (
         <View style={styles.statsRow}>
-          <Text style={styles.stat}>⚡ {Math.round(reading.speed)} km/h</Text>
-          <Text style={styles.stat}>🌡 {reading.temperature.toFixed(1)}°C</Text>
+          <Text style={styles.stat}>⚡ {speed !== undefined ? Math.round(speed) : 0} km/h</Text>
+          <Text style={styles.stat}>🌡 {temp !== undefined ? temp.toFixed(1) : 0}°C</Text>
         </View>
       ) : (
         <Text style={styles.noData}>Awaiting data...</Text>

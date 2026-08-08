@@ -37,8 +37,13 @@ export async function registerForPushNotifications() {
     });
   }
 
-  const token = await Notifications.getExpoPushTokenAsync();
-  return token.data;
+  try {
+    const token = await Notifications.getExpoPushTokenAsync();
+    return token.data;
+  } catch (err) {
+    console.warn('Push tokens are not supported directly in Expo Go SDK 53+:', err.message);
+    return null;
+  }
 }
 
 export async function scheduleLocalAlert(title, body) {

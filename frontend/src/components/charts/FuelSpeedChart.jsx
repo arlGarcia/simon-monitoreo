@@ -26,10 +26,16 @@ export function FuelSpeedChart({ readings }) {
     );
   }
 
+  const normalizedData = readings.map((r) => ({
+    time: r.time,
+    fuel_level: r.fuel_level ?? r.FuelLevel ?? 0,
+    speed: r.speed ?? r.Speed ?? 0,
+  }));
+
   return (
     <div className={styles.chartWrapper}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={readings} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
+        <LineChart data={normalizedData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
           <XAxis dataKey="time" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} />
           <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} />

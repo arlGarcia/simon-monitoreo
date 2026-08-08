@@ -5,31 +5,31 @@ import (
 )
 
 type Vehicle struct {
-	ID          string
-	DisplayID   string
-	Name        string
-	LicensePlate string
-	OwnerID     string
-	CreatedAt   time.Time
+	ID           string    `json:"id"`
+	DisplayID    string    `json:"display_id"`
+	Name         string    `json:"name"`
+	LicensePlate string    `json:"license_plate"`
+	OwnerID      string    `json:"owner_id"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type SensorReading struct {
-	ID          string
-	VehicleID   string
-	Latitude    float64
-	Longitude   float64
-	Speed       float64
-	FuelLevel   float64
-	Temperature float64
-	RecordedAt  time.Time
+	ID          string    `json:"id"`
+	VehicleID   string    `json:"vehicle_id"`
+	Latitude    float64   `json:"latitude"`
+	Longitude   float64   `json:"longitude"`
+	Speed       float64   `json:"speed"`
+	FuelLevel   float64   `json:"fuel_level"`
+	Temperature float64   `json:"temperature"`
+	RecordedAt  time.Time `json:"recorded_at"`
 }
 
 type Alert struct {
-	ID        string
-	VehicleID string
-	Type      AlertType
-	Message   string
-	CreatedAt time.Time
+	ID        string    `json:"id"`
+	VehicleID string    `json:"vehicle_id"`
+	Type      AlertType `json:"type"`
+	Message   string    `json:"message"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 type AlertType string

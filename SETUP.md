@@ -50,19 +50,36 @@ Entra con credenciales `admin` / `admin123` para ver alertas predictivas.
 
 La app móvil emula y sincroniza las mismas funcionalidades nativamente, con soporte offline via `AsyncStorage`.
 
+### 3.1. Configuración de Variables de Entorno para Expo Go
+Si deseas probar la app desde un **celular físico** usando la aplicación **Expo Go**, debes configurar tu dirección IP de red local para que el celular pueda comunicarse con el backend en Go de tu computadora:
+
+1. Obtén la IP local de tu PC en la red Wi-Fi:
+   - **Windows**: Ejecuta `ipconfig` en la consola y copia la `Dirección IPv4` (Ejemplo: `192.168.1.7`).
+   - **Mac/Linux**: Ejecuta `ifconfig` o `ip a`.
+2. En la carpeta `mobile`, crea o edita el archivo `.env`:
+   ```env
+   EXPO_PUBLIC_API_URL=http://<TU_IP_LOCAL>:8080
+   EXPO_PUBLIC_WS_URL=ws://<TU_IP_LOCAL>:8080
+   ```
+   *(Ejemplo: `EXPO_PUBLIC_API_URL=http://192.168.1.7:8080`)*
+
+### 3.2. Ejecución de la App Móvil
 ```bash
 cd mobile
 
 # Instalar dependencias
-npm install
+pnpm install
 
-# Correr la app localmente
-npm start
+# Correr la app limpiando caché
+npx expo start -c
 ```
-Se abrirá Expo Metro Bundler. Puedes presionar:
-- `a` para abrir en emulador de Android.
-- `i` para abrir en simulador iOS.
-- O escanear el código QR con la app **Expo Go** en un dispositivo físico.
+Se abrirá Expo Metro Bundler y mostrará un código QR en la consola:
+- Asegúrate de que **tu celular y tu computadora estén en la misma red Wi-Fi**.
+- Abre la app **Expo Go** en tu dispositivo Android o la app Cámara en iOS.
+- Escanea el código QR mostrado en la terminal.
+- Inicia sesión con `admin` / `admin123`.
+
+*Nota: También puedes presionar `a` para abrir en emulador de Android Studio o `i` para simulador de iOS.*
 
 ---
 

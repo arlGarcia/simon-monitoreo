@@ -39,15 +39,19 @@ export function VehicleList({ vehicles, latestReadings, selectedVehicleId, onSel
 
   return (
     <div className={styles.list}>
-      {vehicles.map((v) => (
-        <VehicleCard
-          key={v.id}
-          vehicle={v}
-          reading={latestReadings[v.id]}
-          isSelected={selectedVehicleId === v.id}
-          onClick={() => onSelect(v.id)}
-        />
-      ))}
+      {vehicles.map((v, index) => {
+        const vKey = v.id || v.ID || `veh-${index}`;
+        const vId = v.id || v.ID;
+        return (
+          <VehicleCard
+            key={vKey}
+            vehicle={v}
+            reading={latestReadings[vId]}
+            isSelected={selectedVehicleId === vId}
+            onClick={() => onSelect(vId)}
+          />
+        );
+      })}
     </div>
   );
 }

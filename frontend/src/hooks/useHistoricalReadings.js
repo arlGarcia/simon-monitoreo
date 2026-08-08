@@ -8,13 +8,16 @@ export function useHistoricalReadings(vehicleId) {
   const [loading, setLoading] = useState(false);
 
   const fetchReadings = useCallback(async () => {
-    if (!vehicleId) return;
+    if (!vehicleId) {
+      setReadings([]);
+      return;
+    }
     setLoading(true);
     try {
       const data = await api.getHistoricalReadings(vehicleId, 60);
       const normalized = (data || []).map((r) => ({
         ...r,
-        time: new Date(r.recorded_at).toLocaleTimeString(),
+        time: new Date(r.recorded_at || Date.now()).toLocaleTimeString(),
       }));
       setReadings(normalized.reverse());
     } catch {
@@ -24,9 +27,25 @@ export function useHistoricalReadings(vehicleId) {
     }
   }, [vehicleId]);
 
+  const addReading = useCallback(
+    (newReading) => {
+      const vId = newReading?.vehicle_id || newReading?.VehicleID;
+      if (!vehicleId || vId !== vehicleId) return;
+
+      setReadings((prev) => [
+        ...prev,
+        {
+          ...newReading,
+          time: new Date(newReading.recorded_at || Date.now()).toLocaleTimeString(),
+        },
+      ]);
+    },
+    [vehicleId]
+  );
+
   useEffect(() => {
     fetchReadings();
   }, [fetchReadings]);
 
-  return { readings, loading };
+  return { readings, loading, addReading, refreshReadings: fetchReadings };
 }

@@ -11,10 +11,14 @@ import (
 
 type vehicleHandler struct {
 	vehicleService *application.VehicleService
+	sensorService  *application.SensorService
 }
 
-func NewVehicleHandler(vehicleService *application.VehicleService) *vehicleHandler {
-	return &vehicleHandler{vehicleService: vehicleService}
+func NewVehicleHandler(vehicleService *application.VehicleService, sensorService *application.SensorService) *vehicleHandler {
+	return &vehicleHandler{
+		vehicleService: vehicleService,
+		sensorService:  sensorService,
+	}
 }
 
 func (h *vehicleHandler) ListVehicles(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +93,11 @@ func (h *vehicleHandler) GetHistoricalReadings(w http.ResponseWriter, r *http.Re
 		}
 	}
 
-	_ = vehicleID
-	_ = limit
-	writeJSON(w, http.StatusOK, []any{})
+	readings, err := h.sensorService.GetHistoricalReadings(r.Context(), vehicleID, limit)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to get historical readings")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, readings)
 }

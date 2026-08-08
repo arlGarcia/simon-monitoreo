@@ -26,15 +26,18 @@ export default function DashboardPage() {
 
   const { vehicles, latestReadings, updateReadingForVehicle, loading, offline } = useVehicles();
   const { alerts, addAlert } = useAlerts(selectedVehicleId);
-  const { readings } = useHistoricalReadings(selectedVehicleId);
+  const { readings, addReading } = useHistoricalReadings(selectedVehicleId);
 
   useEffect(() => {
     if (ready && !user) router.push('/login');
   }, [ready, user, router]);
 
   const handleSensorReading = useCallback(
-    (reading) => updateReadingForVehicle(reading),
-    [updateReadingForVehicle]
+    (reading) => {
+      updateReadingForVehicle(reading);
+      addReading(reading);
+    },
+    [updateReadingForVehicle, addReading]
   );
 
   const handleAlert = useCallback(
@@ -52,7 +55,7 @@ export default function DashboardPage() {
         <div className={styles.brand}>
           <span className={styles.brandIcon}>🛰️</span>
           <div>
-            <span className={styles.brandName}>FleetPulse</span>
+            <span className={styles.brandName}>SimonGO</span>
             <span className={styles.brandRole}>{isAdmin ? '🔑 Admin' : '👤 Viewer'}</span>
           </div>
         </div>

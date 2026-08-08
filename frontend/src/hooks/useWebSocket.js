@@ -30,7 +30,9 @@ export function useWebSocket({ onSensorReading, onAlert }) {
       reconnectTimer.current = setTimeout(connect, RECONNECT_DELAY_MS);
     };
 
-    ws.onerror = () => ws.close();
+    ws.onerror = (err) => {
+      console.warn('WebSocket warning/error:', err);
+    };
   }, [onSensorReading, onAlert]);
 
   useEffect(() => {
