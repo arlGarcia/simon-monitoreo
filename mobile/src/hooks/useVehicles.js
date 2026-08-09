@@ -1,6 +1,17 @@
 import { useState, useCallback } from 'react';
 import { api } from '../lib/api';
-import { cacheVehicles, getCachedVehicles, cacheReading } from '../lib/offline';
+import { cacheVehicles, getCachedVehicles, cacheReading, getCachedReadings } from '../lib/offline';
+
+function deduplicateVehicles(list) {
+  const map = new Map();
+  for (const item of list) {
+    const id = item.id || item.ID;
+    if (id && !map.has(id)) {
+      map.set(id, item);
+    }
+  }
+  return Array.from(map.values());
+}
 
 export function useVehicles() {
   const [vehicles, setVehicles] = useState([]);
@@ -12,7 +23,7 @@ export function useVehicles() {
     setLoading(true);
     try {
       const data = await api.listVehicles();
-      const list = data || [];
+      const list = deduplicateVehicles(data || []);
       setVehicles(list);
       setOffline(false);
       await cacheVehicles(list);
@@ -24,24 +35,32 @@ export function useVehicles() {
           if (!vId) return;
           try {
             const reading = await api.getLatestReading(vId);
-            if (reading) readingsMap[vId] = reading;
+            if (reading) {
+              readingsMap[vId] = reading;
+              await cacheReading(vId, reading);
+            }
           } catch {}
         })
       );
       setLatestReadings((prev) => ({ ...prev, ...readingsMap }));
     } catch {
       setOffline(true);
-      const cached = await getCachedVehicles();
-      setVehicles(cached || []);
+      const cachedList = await getCachedVehicles();
+      const cachedReadings = await getCachedReadings();
+      setVehicles(deduplicateVehicles(cachedList || []));
+      setLatestReadings(cachedReadings || {});
     } finally {
       setLoading(false);
     }
   }, []);
 
   const updateReading = useCallback((reading) => {
-    setLatestReadings((prev) => ({ ...prev, [reading.vehicle_id]: reading }));
-    cacheReading(reading.vehicle_id, reading);
+    const vId = reading.vehicle_id || reading.VehicleID;
+    if (!vId) return;
+    setLatestReadings((prev) => ({ ...prev, [vId]: reading }));
+    cacheReading(vId, reading);
   }, []);
 
   return { vehicles, latestReadings, updateReading, loading, offline, fetchVehicles };
 }
+

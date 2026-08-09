@@ -114,6 +114,23 @@ func seedAdminUser(ctx context.Context, userRepo *postgres.UserPostgresRepositor
 		}
 	}
 
+	_, errUser := userRepo.FindByUsername(ctx, "user")
+	if errUser == domain.ErrUserNotFound {
+		standardUser := domain.User{
+			ID:           uuid.NewString(),
+			Username:     "user",
+			PasswordHash: application.HashPassword("user123"),
+			Role:         domain.RoleUser,
+			CreatedAt:    time.Now(),
+		}
+		if saveErr := userRepo.Save(ctx, standardUser); saveErr != nil {
+			log.Printf("warning: failed to seed standard user: %v", saveErr)
+		} else {
+			log.Println("standard user seeded (username: user, password: user123)")
+		}
+	}
+
+
 	vehicles, err := vehicleRepo.FindAll(ctx)
 	if err == nil && len(vehicles) == 0 {
 		initialVehicles := []struct {
